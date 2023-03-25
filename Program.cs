@@ -1,4 +1,5 @@
-﻿using static System.Console;
+﻿using System.IO;
+using static System.Console;
 namespace MJU23v_D10_inl_sveng
 {
     internal class Program
@@ -34,16 +35,8 @@ namespace MJU23v_D10_inl_sveng
                 }
                 else if (command == "load")
                 {
-                    if (argument.Length == 2)
-                    {
-                        // DID: Byggt om om pathSträngen så att användaren kan skriva enbart filnamnet
-                        string path = BuildPath(argument); 
-                        if (File.Exists(path)) LoadDict(path); else WriteLine($"Failed to load from. {path}");
-                    }
-                    else if (argument.Length == 1)
-                    {
-                        LoadDict(defaultFile);
-                    }
+                    if (argument.Length == 2) LoadTry(BuildPath(argument));
+                    else if (argument.Length == 1) LoadTry(defaultFile);
                 }
                 else if (command == "list")
                 {
@@ -140,7 +133,7 @@ namespace MJU23v_D10_inl_sveng
                 }
             }
             while (running);
-            
+
             /// Bygger Path Till Projektets Dict Katalog
             /// Och lägger till ".lis" om det saknas
             static string BuildPath(string[] argument)
@@ -151,6 +144,12 @@ namespace MJU23v_D10_inl_sveng
                 return path;
             }
         } // End Main
+
+        private static void LoadTry(string path)
+        {
+            if (File.Exists(path)) LoadDict(path);
+            else WriteLine($"Failed to load from. {path}");
+        }
 
         private static void LoadDict(string argument)
         {
@@ -184,3 +183,5 @@ namespace MJU23v_D10_inl_sveng
  */
 // DID: Running = false för att avsluta
 // DID: Faktoriserat ut till metod LoadDict()
+// DID: Byggt om om pathSträngen så att användaren kan skriva enbart filnamnet
+// DID: Quick n dirty check if file exist.
