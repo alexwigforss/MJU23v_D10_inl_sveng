@@ -28,11 +28,13 @@
                 if (command == "quit")
                 {
                     Console.WriteLine("Goodbye!");
+                    // FIXME: sätt runningvariabel till false så den stängs
                 }
                 else if (command == "load")
                 {
                     if(argument.Length == 2)
-                    {
+                    {   // TBD: Faktorisera ut till metod LoadDict()
+                        // FIXME: Bygg om om pathSträngen så att användaren kan skriva enbart filnamnet
                         using (StreamReader sr = new StreamReader(argument[1]))
                         {
                             dictionary = new List<SweEngGloss>(); // Empty it!
@@ -46,7 +48,7 @@
                         }
                     }
                     else if(argument.Length == 1)
-                    {
+                    {   // TBD: Faktorisera ut till metod LoadDict()
                         using (StreamReader sr = new StreamReader(defaultFile))
                         {
                             dictionary = new List<SweEngGloss>(); // Empty it!
@@ -75,10 +77,12 @@
                     }
                     else if(argument.Length == 1)
                     {
+                        // TBD: Faktorisera ut till WordPrompt()
                         Console.WriteLine("Write word in Swedish: ");
                         string s = Console.ReadLine();
                         Console.Write("Write word in English: ");
                         string e = Console.ReadLine();
+
                         dictionary.Add(new SweEngGloss(s, e));
                     }
                 }
@@ -86,6 +90,7 @@
                 {
                     if (argument.Length == 3)
                     {
+                        // TBD: Faktorisera ut till DeleteWord()
                         int index = -1;
                         for (int i = 0; i < dictionary.Count; i++) {
                             SweEngGloss gloss = dictionary[i];
@@ -96,10 +101,13 @@
                     }
                     else if (argument.Length == 1)
                     {
+                        // TBD: Faktorisera ut till WordPrompt()
                         Console.WriteLine("Write word in Swedish: ");
                         string s = Console.ReadLine();
                         Console.Write("Write word in English: ");
                         string e = Console.ReadLine();
+
+                        // TBD: Faktorisera ut till DeleteWord()
                         int index = -1;
                         for (int i = 0; i < dictionary.Count; i++)
                         {
@@ -107,6 +115,7 @@
                             if (gloss.word_swe == s && gloss.word_eng == e)
                                 index = i;
                         }
+                        // FIXME: Index was out of range (om input saknas i listan)
                         dictionary.RemoveAt(index);
                     }
                 }
@@ -114,6 +123,7 @@
                 {
                     if (argument.Length == 2)
                     {
+                        // TBD: Bryt ut till TranslateWord()
                         foreach(SweEngGloss gloss in dictionary)
                         {
                             if (gloss.word_swe == argument[1])
@@ -126,6 +136,9 @@
                     {
                         Console.WriteLine("Write word to be translated: ");
                         string s = Console.ReadLine();
+                        // TBD: Bryt ut till TranslateWord()
+                        // FIXME:  System.NullReferenceException (om dictionary inte laddats)
+                        // TBD: Informera användaren om ordet saknas i listan.
                         foreach (SweEngGloss gloss in dictionary)
                         {
                             if (gloss.word_swe == s)
@@ -138,9 +151,19 @@
                 else
                 {
                     Console.WriteLine($"Unknown command: '{command}'");
+                    // TBD: Skriv ut StringOfAvailableCommands
                 }
             }
             while (true);
-        }
-    }
+        } // End Main
+        // DOIN: StringOfAvailableCommands
+    } // End Program
 }
+/*
+ *  TASK: s (Pasted from assignment)
+ *  Notera eventuella fel! Lägg in dem som // FIXME-kommentarer, [Done]
+ *  om ni vill lägga in en helpfunktion []
+ *  TODO: enbokstavsvariabler skall döpas om []
+ *  TODO: koddubbletter skall bort, [] 
+ *  Rekomenderade tester [Done] Resulterat i Fixme's
+ */
