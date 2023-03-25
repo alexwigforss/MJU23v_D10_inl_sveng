@@ -19,6 +19,7 @@ namespace MJU23v_D10_inl_sveng
         }
         static void Main(string[] args)
         {
+            bool running = true;
             string defaultFile = "..\\..\\..\\dict\\sweeng.lis";
             WriteLine("Welcome to the dictionary app!");
             do
@@ -26,15 +27,16 @@ namespace MJU23v_D10_inl_sveng
                 Write("> ");
                 string[] argument = ReadLine().Split();
                 string command = argument[0];
-                if (command == "quit")
+                if (command.ToLower() == "quit" || command.ToLower() == "exit" )
                 {
                     WriteLine("Goodbye!");
-                    // FIXME: sätt runningvariabel till false så den stängs
+                    // DID: satt runningvariabel till false så den stängs
+                    running = false;
                 }
                 else if (command == "load")
                 {
                     if (argument.Length == 2)
-                    {   // TBD: Faktorisera ut till metod LoadDict()
+                    {   // DOIN: Faktorisera ut till metod LoadDict()
                         // FIXME: Bygg om om pathSträngen så att användaren kan skriva enbart filnamnet
                         using (StreamReader sr = new StreamReader(argument[1]))
                         {
@@ -157,9 +159,9 @@ namespace MJU23v_D10_inl_sveng
                     //DID: Skriv ut StringOfAvailableCommands
                 }
             }
-            while (true);
+            while (running);
         } // End Main
-          // DOIN: StringOfAvailableCommands
+          // DID: StringOfAvailableCommands
         static String AvailableCommands() => "quit, load, load filename\n" +
                                              "list, new, new [swe] [eng]\n" +
                                              "delete, delete [swe] [eng]\n" +
@@ -169,7 +171,7 @@ namespace MJU23v_D10_inl_sveng
 /*
  *  TASK: s (Pasted from assignment)
  *  Notera eventuella fel! Lägg in dem som // FIXME-kommentarer, [Done]
- *  om ni vill lägga in en helpfunktion []
+ *  om ni vill lägga in en helpfunktion [Done]
  *  TODO: enbokstavsvariabler skall döpas om []
  *  TODO: koddubbletter skall bort, [] 
  *  Rekomenderade tester [Done] Resulterat i Fixme's
