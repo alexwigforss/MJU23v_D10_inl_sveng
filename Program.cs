@@ -21,10 +21,12 @@ namespace MJU23v_D10_inl_sveng
         static void Main(string[] args)
         {
             bool running = true;
+            // ↓ QuickFix So We Can Add New To Empty
+            dictionary = new List<SweEngGloss>();
             string defaultFile = "..\\..\\..\\dict\\sweeng.lis";
             WriteLine("Welcome to the dictionary app!");
             do
-            {
+            {   
                 Write("> ");
                 string[] argument = ReadLine().Split();
                 string command = argument[0];
@@ -53,12 +55,7 @@ namespace MJU23v_D10_inl_sveng
                     }
                     else if (argument.Length == 1)
                     {
-                        // DOIN: Faktorisera ut till WordPrompt()
-                        WriteLine("Write word in Swedish: ");
-                        string s = ReadLine();
-                        Write("Write word in English: ");
-                        string e = ReadLine();
-
+                        PromptWords(out string s, out string e);
                         dictionary.Add(new SweEngGloss(s, e));
                     }
                 }
@@ -78,11 +75,7 @@ namespace MJU23v_D10_inl_sveng
                     }
                     else if (argument.Length == 1)
                     {
-                        // DOIN: Faktorisera ut till WordPrompt()
-                        WriteLine("Write word in Swedish: ");
-                        string s = ReadLine();
-                        Write("Write word in English: ");
-                        string e = ReadLine();
+                        PromptWords(out string s, out string e);
 
                         // TBD: Faktorisera ut till DeleteWord()
                         int index = -1;
@@ -125,6 +118,7 @@ namespace MJU23v_D10_inl_sveng
                         }
                     }
                 }
+                // FIXME: Om parametrar fler än två. Medela att det ej är tillåtet (kanske med en trycatch runt hela if-kedjan)
                 else
                 {
                     if (command.ToLower() != "help") WriteLine($"Unknown command: '{command}'\n");
@@ -144,6 +138,15 @@ namespace MJU23v_D10_inl_sveng
                 return path;
             }
         } // End Main
+
+        private static void PromptWords(out string s, out string e)
+        {
+            // DID: Faktoriserat ut till PromptWords()
+            WriteLine("Write word in Swedish: ");
+            s = ReadLine();
+            Write("Write word in English: ");
+            e = ReadLine();
+        }
 
         private static void LoadTry(string path)
         {
@@ -175,11 +178,10 @@ namespace MJU23v_D10_inl_sveng
 }
 /*
  *  TASK: s (Pasted from assignment)
- *  Notera eventuella fel! Lägg in dem som // FIXME-kommentarer, [Done]
- *  om ni vill lägga in en helpfunktion [Done]
+ *  DID: Notera eventuella fel! Lägg in dem som // FIXME-kommentarer, [X]
+ *  DID: om ni vill lägga in en helpfunktion [X]
  *  TODO: enbokstavsvariabler skall döpas om []
  *  TODO: koddubbletter skall bort, [] 
- *  Rekomenderade tester [Done] Resulterat i Fixme's
  */
 // DID: Running = false för att avsluta
 // DID: Faktoriserat ut till metod LoadDict()
