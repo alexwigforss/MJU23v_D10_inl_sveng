@@ -26,68 +26,30 @@ namespace MJU23v_D10_inl_sveng
             string defaultFile = "..\\..\\..\\dict\\sweeng.lis";
             WriteLine("Welcome to the dictionary app!");
             do
-            {   
+            {
                 Write("> ");
                 string[] argument = ReadLine().Split();
                 string command = argument[0];
                 if (command.ToLower() == "quit" || command.ToLower() == "exit")
-                {
-                    WriteLine("Goodbye!");
-                    running = false;
-                }
+                    running = SafeExit();
                 else if (command == "load")
                 {
                     if (argument.Length == 2) LoadTry(BuildPath(argument));
                     else if (argument.Length == 1) LoadTry(defaultFile);
                 }
                 else if (command == "list")
-                {
-                    foreach (SweEngGloss gloss in dictionary)
-                    {
-                        WriteLine($"{gloss.word_swe,-10}  - {gloss.word_eng,-10}");
-                    }
-                }
+                    ListDict();
                 else if (command == "new")
                 {
-                    if (argument.Length == 3)
-                    {
-                        dictionary.Add(new SweEngGloss(argument[1], argument[2]));
-                    }
-                    else if (argument.Length == 1)
-                    {
-                        PromptWords(out string s, out string e);
-                        dictionary.Add(new SweEngGloss(s, e));
-                    }
+                    if (argument.Length == 3) dictionary.Add(new SweEngGloss(argument[1], argument[2]));
+                    else if (argument.Length == 1) NewNoParams();
                 }
                 else if (command == "delete")
                 {
                     if (argument.Length == 3)
-                    {
-                        // TBD: Faktorisera ut till DeleteWord()
-                        int index = -1;
-                        for (int i = 0; i < dictionary.Count; i++)
-                        {
-                            SweEngGloss gloss = dictionary[i];
-                            if (gloss.word_swe == argument[1] && gloss.word_eng == argument[2])
-                                index = i;
-                        }
-                        dictionary.RemoveAt(index);
-                    }
+                        DeleteWords(argument[1], argument[2]);
                     else if (argument.Length == 1)
-                    {
-                        PromptWords(out string s, out string e);
-
-                        // TBD: Faktorisera ut till DeleteWord()
-                        int index = -1;
-                        for (int i = 0; i < dictionary.Count; i++)
-                        {
-                            SweEngGloss gloss = dictionary[i];
-                            if (gloss.word_swe == s && gloss.word_eng == e)
-                                index = i;
-                        }
-                        // FIXME: Index was out of range (om input saknas i listan)
-                        dictionary.RemoveAt(index);
-                    }
+                        Delete();
                 }
                 else if (command == "translate")
                 {
@@ -105,6 +67,7 @@ namespace MJU23v_D10_inl_sveng
                     else if (argument.Length == 1)
                     {
                         WriteLine("Write word to be translated: ");
+                        // DOIN: Namnge enTeckensVariabler
                         string s = ReadLine();
                         // TBD: Bryt ut till TranslateWord()
                         // FIXME:  System.NullReferenceException (om dictionary inte laddats)
@@ -137,7 +100,48 @@ namespace MJU23v_D10_inl_sveng
                     path += ".lis";
                 return path;
             }
+
+            static void NewNoParams()
+            {
+                PromptWords(out string s, out string e);
+                dictionary.Add(new SweEngGloss(s, e));
+            }
+
+            static void Delete()
+            {
+                PromptWords(out string s, out string e);
+                DeleteWords(s, e);
+            }
         } // End Main
+
+        private static void ListDict()
+        {
+            foreach (SweEngGloss gloss in dictionary)
+            {
+                WriteLine($"{gloss.word_swe,-10}  - {gloss.word_eng,-10}");
+            }
+        }
+
+        private static bool SafeExit()
+        {
+            bool running;
+            WriteLine("Goodbye!");
+            running = false;
+            return running;
+        }
+
+        private static void DeleteWords(string s, string e)
+        {
+            int index = -1;
+            for (int i = 0; i < dictionary.Count; i++)
+            {
+                SweEngGloss gloss = dictionary[i];
+                if (gloss.word_swe == s && gloss.word_eng == e)
+                    index = i;
+            }
+            // FIXME: Index was out of range (om input saknas i listan)
+            dictionary.RemoveAt(index);
+        }
 
         private static void PromptWords(out string s, out string e)
         {
@@ -180,10 +184,11 @@ namespace MJU23v_D10_inl_sveng
  *  TASK: s (Pasted from assignment)
  *  DID: Notera eventuella fel! Lägg in dem som // FIXME-kommentarer, [X]
  *  DID: om ni vill lägga in en helpfunktion [X]
- *  TODO: enbokstavsvariabler skall döpas om []
+ *  DOIN: enbokstavsvariabler skall döpas om []
  *  TODO: koddubbletter skall bort, [] 
  */
 // DID: Running = false för att avsluta
 // DID: Faktoriserat ut till metod LoadDict()
 // DID: Byggt om om pathSträngen så att användaren kan skriva enbart filnamnet
 // DID: Quick n dirty check if file exist.
+// DID: Faktorisera ut till DeleteWords()
