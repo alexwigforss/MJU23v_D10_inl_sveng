@@ -55,29 +55,11 @@ namespace MJU23v_D10_inl_sveng
                     if (argument.Length == 2)
                     {
                         // TBD: Bryt ut till TranslateWord()
-                        foreach (SweEngGloss gloss in dictionary)
-                        {
-                            if (gloss.word_swe == argument[1])
-                                WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
-                            if (gloss.word_eng == argument[1])
-                                WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
-                        }
+                        TranslateWord(argument[1]);
                     }
                     else if (argument.Length == 1)
                     {
-                        WriteLine("Write word to be translated: ");
-                        // DOIN: Namnge enTeckensVariabler
-                        string swe_word = ReadLine();
-                        // TBD: Bryt ut till TranslateWord()
-                        // FIXME:  System.NullReferenceException (om dictionary inte laddats)
-                        // TBD: Informera användaren om ordet saknas i listan.
-                        foreach (SweEngGloss gloss in dictionary)
-                        {
-                            if (gloss.word_swe == swe_word)
-                                WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
-                            if (gloss.word_eng == swe_word)
-                                WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
-                        }
+                        TranslateWord(ProptWord());
                     }
                 }
                 // FIXME: Om parametrar fler än två. Medela att det ej är tillåtet (kanske med en trycatch runt hela if-kedjan)
@@ -85,7 +67,6 @@ namespace MJU23v_D10_inl_sveng
                 {
                     if (command.ToLower() != "help") WriteLine($"Unknown command: '{command}'\n");
                     WriteLine(AvailableCommands());
-                    //DID: Skriv ut StringOfAvailableCommands
                 }
             }
             while (running);
@@ -111,7 +92,27 @@ namespace MJU23v_D10_inl_sveng
                 PromptWords(out string? swe, out string? eng);
                 DeleteWords(swe, eng);
             }
+
+            static string ProptWord()
+            {
+                WriteLine("Write word to be translated: ");
+                string swe_word = ReadLine();
+                return swe_word;
+            }
         } // End Main
+
+        private static void TranslateWord(string swe_word)
+        {
+            // FIXED:  System.NullReferenceException
+            // TBD: Informera användaren om ordet saknas i listan.
+            foreach (SweEngGloss gloss in dictionary)
+            {
+                if (gloss.word_swe == swe_word)
+                    WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
+                if (gloss.word_eng == swe_word)
+                    WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
+            }
+        }
 
         private static void ListDict()
         {
@@ -186,8 +187,11 @@ namespace MJU23v_D10_inl_sveng
  */
 // DID: Running = false för att avsluta
 // DID: StringOfAvailableCommands
+// DID: Skriv ut StringOfAvailableCommands
 // DID: Faktoriserat ut till metod LoadDict()
 // DID: Byggt om om pathSträngen så att användaren kan skriva enbart filnamnet
 // DID: Quick n dirty check if file exist.
 // DID: Faktoriserat ut till PromptWords()
 // DID: Faktorisera ut till DeleteWords()
+// DID: Namngivit enTeckensVariabler s & e
+// DID: Bryt ut till TranslateWord()
