@@ -30,14 +30,18 @@ namespace MJU23v_D10_inl_sveng
                 string[] argument = ReadLine().Split();
                 string command = argument[0];
                 if (command.ToLower() == "quit" || command.ToLower() == "exit")
+                {
                     running = SafeExit();
+                }
                 else if (command == "load")
                 {
                     if (argument.Length == 2) LoadTry(BuildPath(argument));
                     else if (argument.Length == 1) LoadTry(defaultFile);
                 }
                 else if (command == "list")
+                {
                     ListDict();
+                }
                 else if (command == "new")
                 {
                     if (argument.Length == 3) dictionary.Add(new SweEngGloss(argument[1], argument[2]));
@@ -45,22 +49,14 @@ namespace MJU23v_D10_inl_sveng
                 }
                 else if (command == "delete")
                 {
-                    if (argument.Length == 3)
-                        DeleteWords(argument[1], argument[2]);
-                    else if (argument.Length == 1)
-                        Delete();
+                    if (argument.Length == 2) DeleteWords(argument[1]);
+                    if (argument.Length == 3) DeleteWords(argument[1], argument[2]);
+                    else if (argument.Length == 1) Delete();
                 }
                 else if (command == "translate")
                 {
-                    if (argument.Length == 2)
-                    {
-                        // TBD: Bryt ut till TranslateWord()
-                        TranslateWord(argument[1]);
-                    }
-                    else if (argument.Length == 1)
-                    {
-                        TranslateWord(ProptWord());
-                    }
+                    if (argument.Length == 2) TranslateWord(argument[1]);
+                    else if (argument.Length == 1) TranslateWord(ProptWord());
                 }
                 // FIXME: Om parametrar fler än två. Medela att det ej är tillåtet (kanske med en trycatch runt hela if-kedjan)
                 else
@@ -103,8 +99,6 @@ namespace MJU23v_D10_inl_sveng
 
         private static void TranslateWord(string swe_word)
         {
-            // FIXED:  System.NullReferenceException
-            // TBD: Informera användaren om ordet saknas i listan.
             foreach (SweEngGloss gloss in dictionary)
             {
                 if (gloss.word_swe == swe_word)
@@ -130,17 +124,35 @@ namespace MJU23v_D10_inl_sveng
             return running;
         }
 
-        private static void DeleteWords(string swe, string eng)
+        private static void DeleteWords(string swe, string? eng = null)
         {
             int index = -1;
-            for (int i = 0; i < dictionary.Count; i++)
+            if (eng == null)
+                for (int i = 0; i < dictionary.Count; i++)
+                {
+                    SweEngGloss gloss = dictionary[i];
+                    if (gloss.word_swe == swe)
+                        index = i;
+                }
+            else
+                for (int i = 0; i < dictionary.Count; i++)
+                {
+                    SweEngGloss gloss = dictionary[i];
+                    if (gloss.word_swe == swe && gloss.word_eng == eng)
+                        index = i;
+                }
+            try
             {
-                SweEngGloss gloss = dictionary[i];
-                if (gloss.word_swe == swe && gloss.word_eng == eng)
-                    index = i;
+                dictionary.RemoveAt(index);
             }
-            // FIXME: Index was out of range (om input saknas i listan)
-            dictionary.RemoveAt(index);
+            catch (ArgumentOutOfRangeException)
+            {
+                WriteLine($"Could not find {swe} {eng} in list.");
+            }
+            catch (Exception exception)
+            {
+                WriteLine(exception);
+            }
         }
 
         private static void PromptWords(out string? swe, out string? eng)
@@ -154,7 +166,7 @@ namespace MJU23v_D10_inl_sveng
         private static void LoadTry(string path)
         {
             if (File.Exists(path)) LoadDict(path);
-            else WriteLine($"Failed to load from. {path}");
+            else WriteLine($"Failed to load from. {Path.GetFullPath(path)}");
         }
 
         private static void LoadDict(string argument)
@@ -179,11 +191,11 @@ namespace MJU23v_D10_inl_sveng
     } // End Program
 }
 /*
- *  TASK: s (Pasted from assignment)
+ *  TASKs (Pasted from assignment)
  *  DID: Notera eventuella fel! Lägg in dem som // FIXME-kommentarer, [X]
  *  DID: om ni vill lägga in en helpfunktion [X]
  *  DID: enbokstavsvariabler skall döpas om [X]
- *  TODO: koddubbletter skall bort, [] 
+ *  DID: koddubbletter skall bort, [X] 
  */
 // DID: Running = false för att avsluta
 // DID: StringOfAvailableCommands
@@ -195,3 +207,6 @@ namespace MJU23v_D10_inl_sveng
 // DID: Faktorisera ut till DeleteWords()
 // DID: Namngivit enTeckensVariabler s & e
 // DID: Bryt ut till TranslateWord()
+// FIXED: FileNotFoundException (In LoadTry)
+// FIXED: Index was out of range (om input saknas i listan) (In DeleteWords)
+// DOIN:  Informera användaren om ordet saknas i listan.(Translate)
