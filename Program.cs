@@ -27,33 +27,22 @@ namespace MJU23v_D10_inl_sveng
                 Write("> ");
                 string[] argument = ReadLine().Split();
                 string command = argument[0];
-                if (command.ToLower() == "quit" || command.ToLower() == "exit" )
+                if (command.ToLower() == "quit" || command.ToLower() == "exit")
                 {
                     WriteLine("Goodbye!");
-                    // DID: satt runningvariabel till false så den stängs
                     running = false;
                 }
                 else if (command == "load")
                 {
                     if (argument.Length == 2)
-                    {   // DID: Faktoriserat ut till metod LoadDict()
-                        // DOIN: Bygg om om pathSträngen så att användaren kan skriva enbart filnamnet
-                        LoadDict(argument);
+                    {
+                        // DID: Byggt om om pathSträngen så att användaren kan skriva enbart filnamnet
+                        string path = BuildPath(argument); 
+                        if (File.Exists(path)) LoadDict(path); else WriteLine($"Failed to load from. {path}");
                     }
                     else if (argument.Length == 1)
-                    {   // DID: Faktoriserat ut till metod LoadDict()
-                        LoadDict(new string[] { "",defaultFile });
-                        using (StreamReader sr = new StreamReader(defaultFile))
-                        {
-                            dictionary = new List<SweEngGloss>(); // Empty it!
-                            string line = sr.ReadLine();
-                            while (line != null)
-                            {
-                                SweEngGloss gloss = new SweEngGloss(line);
-                                dictionary.Add(gloss);
-                                line = sr.ReadLine();
-                            }
-                        }
+                    {
+                        LoadDict(defaultFile);
                     }
                 }
                 else if (command == "list")
@@ -71,7 +60,7 @@ namespace MJU23v_D10_inl_sveng
                     }
                     else if (argument.Length == 1)
                     {
-                        // TBD: Faktorisera ut till WordPrompt()
+                        // DOIN: Faktorisera ut till WordPrompt()
                         WriteLine("Write word in Swedish: ");
                         string s = ReadLine();
                         Write("Write word in English: ");
@@ -96,7 +85,7 @@ namespace MJU23v_D10_inl_sveng
                     }
                     else if (argument.Length == 1)
                     {
-                        // TBD: Faktorisera ut till WordPrompt()
+                        // DOIN: Faktorisera ut till WordPrompt()
                         WriteLine("Write word in Swedish: ");
                         string s = ReadLine();
                         Write("Write word in English: ");
@@ -151,11 +140,21 @@ namespace MJU23v_D10_inl_sveng
                 }
             }
             while (running);
+            
+            /// Bygger Path Till Projektets Dict Katalog
+            /// Och lägger till ".lis" om det saknas
+            static string BuildPath(string[] argument)
+            {
+                string path = $"..\\..\\..\\dict\\{argument[1]}";
+                if (!path.Contains(".lis"))
+                    path += ".lis";
+                return path;
+            }
         } // End Main
 
-        private static void LoadDict(string[] argument)
+        private static void LoadDict(string argument)
         {
-            using (StreamReader sr = new StreamReader(argument[1]))
+            using (StreamReader sr = new StreamReader(argument))
             {
                 dictionary = new List<SweEngGloss>(); // Empty it!
                 string line = sr.ReadLine();
@@ -183,3 +182,5 @@ namespace MJU23v_D10_inl_sveng
  *  TODO: koddubbletter skall bort, [] 
  *  Rekomenderade tester [Done] Resulterat i Fixme's
  */
+// DID: Running = false för att avsluta
+// DID: Faktoriserat ut till metod LoadDict()
