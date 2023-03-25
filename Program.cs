@@ -1,5 +1,4 @@
-﻿using System.IO;
-using static System.Console;
+﻿using static System.Console;
 namespace MJU23v_D10_inl_sveng
 {
     internal class Program
@@ -68,15 +67,15 @@ namespace MJU23v_D10_inl_sveng
                     {
                         WriteLine("Write word to be translated: ");
                         // DOIN: Namnge enTeckensVariabler
-                        string s = ReadLine();
+                        string swe_word = ReadLine();
                         // TBD: Bryt ut till TranslateWord()
                         // FIXME:  System.NullReferenceException (om dictionary inte laddats)
                         // TBD: Informera användaren om ordet saknas i listan.
                         foreach (SweEngGloss gloss in dictionary)
                         {
-                            if (gloss.word_swe == s)
+                            if (gloss.word_swe == swe_word)
                                 WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
-                            if (gloss.word_eng == s)
+                            if (gloss.word_eng == swe_word)
                                 WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
                         }
                     }
@@ -103,14 +102,14 @@ namespace MJU23v_D10_inl_sveng
 
             static void NewNoParams()
             {
-                PromptWords(out string s, out string e);
-                dictionary.Add(new SweEngGloss(s, e));
+                PromptWords(out string swe, out string eng);
+                dictionary.Add(new SweEngGloss(swe, eng));
             }
 
             static void Delete()
             {
-                PromptWords(out string s, out string e);
-                DeleteWords(s, e);
+                PromptWords(out string? swe, out string? eng);
+                DeleteWords(swe, eng);
             }
         } // End Main
 
@@ -130,26 +129,25 @@ namespace MJU23v_D10_inl_sveng
             return running;
         }
 
-        private static void DeleteWords(string s, string e)
+        private static void DeleteWords(string swe, string eng)
         {
             int index = -1;
             for (int i = 0; i < dictionary.Count; i++)
             {
                 SweEngGloss gloss = dictionary[i];
-                if (gloss.word_swe == s && gloss.word_eng == e)
+                if (gloss.word_swe == swe && gloss.word_eng == eng)
                     index = i;
             }
             // FIXME: Index was out of range (om input saknas i listan)
             dictionary.RemoveAt(index);
         }
 
-        private static void PromptWords(out string s, out string e)
+        private static void PromptWords(out string? swe, out string? eng)
         {
-            // DID: Faktoriserat ut till PromptWords()
             WriteLine("Write word in Swedish: ");
-            s = ReadLine();
+            swe = ReadLine();
             Write("Write word in English: ");
-            e = ReadLine();
+            eng = ReadLine();
         }
 
         private static void LoadTry(string path)
@@ -173,7 +171,6 @@ namespace MJU23v_D10_inl_sveng
             }
         }
 
-        // DID: StringOfAvailableCommands
         static String AvailableCommands() => "quit, load, load filename\n" +
                                              "list, new, new [swe] [eng]\n" +
                                              "delete, delete [swe] [eng]\n" +
@@ -184,11 +181,13 @@ namespace MJU23v_D10_inl_sveng
  *  TASK: s (Pasted from assignment)
  *  DID: Notera eventuella fel! Lägg in dem som // FIXME-kommentarer, [X]
  *  DID: om ni vill lägga in en helpfunktion [X]
- *  DOIN: enbokstavsvariabler skall döpas om []
+ *  DID: enbokstavsvariabler skall döpas om [X]
  *  TODO: koddubbletter skall bort, [] 
  */
 // DID: Running = false för att avsluta
+// DID: StringOfAvailableCommands
 // DID: Faktoriserat ut till metod LoadDict()
 // DID: Byggt om om pathSträngen så att användaren kan skriva enbart filnamnet
 // DID: Quick n dirty check if file exist.
+// DID: Faktoriserat ut till PromptWords()
 // DID: Faktorisera ut till DeleteWords()
