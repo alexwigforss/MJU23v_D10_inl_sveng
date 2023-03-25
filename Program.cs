@@ -1,4 +1,5 @@
-﻿namespace MJU23v_D10_inl_sveng
+﻿using static System.Console;
+namespace MJU23v_D10_inl_sveng
 {
     internal class Program
     {
@@ -19,20 +20,20 @@
         static void Main(string[] args)
         {
             string defaultFile = "..\\..\\..\\dict\\sweeng.lis";
-            Console.WriteLine("Welcome to the dictionary app!");
+            WriteLine("Welcome to the dictionary app!");
             do
             {
-                Console.Write("> ");
-                string[] argument = Console.ReadLine().Split();
+                Write("> ");
+                string[] argument = ReadLine().Split();
                 string command = argument[0];
                 if (command == "quit")
                 {
-                    Console.WriteLine("Goodbye!");
+                    WriteLine("Goodbye!");
                     // FIXME: sätt runningvariabel till false så den stängs
                 }
                 else if (command == "load")
                 {
-                    if(argument.Length == 2)
+                    if (argument.Length == 2)
                     {   // TBD: Faktorisera ut till metod LoadDict()
                         // FIXME: Bygg om om pathSträngen så att användaren kan skriva enbart filnamnet
                         using (StreamReader sr = new StreamReader(argument[1]))
@@ -47,7 +48,7 @@
                             }
                         }
                     }
-                    else if(argument.Length == 1)
+                    else if (argument.Length == 1)
                     {   // TBD: Faktorisera ut till metod LoadDict()
                         using (StreamReader sr = new StreamReader(defaultFile))
                         {
@@ -64,9 +65,9 @@
                 }
                 else if (command == "list")
                 {
-                    foreach(SweEngGloss gloss in dictionary)
+                    foreach (SweEngGloss gloss in dictionary)
                     {
-                        Console.WriteLine($"{gloss.word_swe,-10}  - {gloss.word_eng,-10}");
+                        WriteLine($"{gloss.word_swe,-10}  - {gloss.word_eng,-10}");
                     }
                 }
                 else if (command == "new")
@@ -75,13 +76,13 @@
                     {
                         dictionary.Add(new SweEngGloss(argument[1], argument[2]));
                     }
-                    else if(argument.Length == 1)
+                    else if (argument.Length == 1)
                     {
                         // TBD: Faktorisera ut till WordPrompt()
-                        Console.WriteLine("Write word in Swedish: ");
-                        string s = Console.ReadLine();
-                        Console.Write("Write word in English: ");
-                        string e = Console.ReadLine();
+                        WriteLine("Write word in Swedish: ");
+                        string s = ReadLine();
+                        Write("Write word in English: ");
+                        string e = ReadLine();
 
                         dictionary.Add(new SweEngGloss(s, e));
                     }
@@ -92,7 +93,8 @@
                     {
                         // TBD: Faktorisera ut till DeleteWord()
                         int index = -1;
-                        for (int i = 0; i < dictionary.Count; i++) {
+                        for (int i = 0; i < dictionary.Count; i++)
+                        {
                             SweEngGloss gloss = dictionary[i];
                             if (gloss.word_swe == argument[1] && gloss.word_eng == argument[2])
                                 index = i;
@@ -102,10 +104,10 @@
                     else if (argument.Length == 1)
                     {
                         // TBD: Faktorisera ut till WordPrompt()
-                        Console.WriteLine("Write word in Swedish: ");
-                        string s = Console.ReadLine();
-                        Console.Write("Write word in English: ");
-                        string e = Console.ReadLine();
+                        WriteLine("Write word in Swedish: ");
+                        string s = ReadLine();
+                        Write("Write word in English: ");
+                        string e = ReadLine();
 
                         // TBD: Faktorisera ut till DeleteWord()
                         int index = -1;
@@ -124,39 +126,44 @@
                     if (argument.Length == 2)
                     {
                         // TBD: Bryt ut till TranslateWord()
-                        foreach(SweEngGloss gloss in dictionary)
+                        foreach (SweEngGloss gloss in dictionary)
                         {
                             if (gloss.word_swe == argument[1])
-                                Console.WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
+                                WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
                             if (gloss.word_eng == argument[1])
-                                Console.WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
+                                WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
                         }
                     }
                     else if (argument.Length == 1)
                     {
-                        Console.WriteLine("Write word to be translated: ");
-                        string s = Console.ReadLine();
+                        WriteLine("Write word to be translated: ");
+                        string s = ReadLine();
                         // TBD: Bryt ut till TranslateWord()
                         // FIXME:  System.NullReferenceException (om dictionary inte laddats)
                         // TBD: Informera användaren om ordet saknas i listan.
                         foreach (SweEngGloss gloss in dictionary)
                         {
                             if (gloss.word_swe == s)
-                                Console.WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
+                                WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
                             if (gloss.word_eng == s)
-                                Console.WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
+                                WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
                         }
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Unknown command: '{command}'");
-                    // TBD: Skriv ut StringOfAvailableCommands
+                    if (command.ToLower() != "help") WriteLine($"Unknown command: '{command}'\n");
+                    WriteLine(AvailableCommands());
+                    //DID: Skriv ut StringOfAvailableCommands
                 }
             }
             while (true);
         } // End Main
-        // DOIN: StringOfAvailableCommands
+          // DOIN: StringOfAvailableCommands
+        static String AvailableCommands() => "quit, load, load filename\n" +
+                                             "list, new, new [swe] [eng]\n" +
+                                             "delete, delete [swe] [eng]\n" +
+                                             "translate, translate [swe] [eng]";
     } // End Program
 }
 /*
