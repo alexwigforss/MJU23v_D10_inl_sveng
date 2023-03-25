@@ -36,22 +36,13 @@ namespace MJU23v_D10_inl_sveng
                 else if (command == "load")
                 {
                     if (argument.Length == 2)
-                    {   // DOIN: Faktorisera ut till metod LoadDict()
-                        // FIXME: Bygg om om pathSträngen så att användaren kan skriva enbart filnamnet
-                        using (StreamReader sr = new StreamReader(argument[1]))
-                        {
-                            dictionary = new List<SweEngGloss>(); // Empty it!
-                            string line = sr.ReadLine();
-                            while (line != null)
-                            {
-                                SweEngGloss gloss = new SweEngGloss(line);
-                                dictionary.Add(gloss);
-                                line = sr.ReadLine();
-                            }
-                        }
+                    {   // DID: Faktoriserat ut till metod LoadDict()
+                        // DOIN: Bygg om om pathSträngen så att användaren kan skriva enbart filnamnet
+                        LoadDict(argument);
                     }
                     else if (argument.Length == 1)
-                    {   // TBD: Faktorisera ut till metod LoadDict()
+                    {   // DID: Faktoriserat ut till metod LoadDict()
+                        LoadDict(new string[] { "",defaultFile });
                         using (StreamReader sr = new StreamReader(defaultFile))
                         {
                             dictionary = new List<SweEngGloss>(); // Empty it!
@@ -161,7 +152,23 @@ namespace MJU23v_D10_inl_sveng
             }
             while (running);
         } // End Main
-          // DID: StringOfAvailableCommands
+
+        private static void LoadDict(string[] argument)
+        {
+            using (StreamReader sr = new StreamReader(argument[1]))
+            {
+                dictionary = new List<SweEngGloss>(); // Empty it!
+                string line = sr.ReadLine();
+                while (line != null)
+                {
+                    SweEngGloss gloss = new SweEngGloss(line);
+                    dictionary.Add(gloss);
+                    line = sr.ReadLine();
+                }
+            }
+        }
+
+        // DID: StringOfAvailableCommands
         static String AvailableCommands() => "quit, load, load filename\n" +
                                              "list, new, new [swe] [eng]\n" +
                                              "delete, delete [swe] [eng]\n" +
