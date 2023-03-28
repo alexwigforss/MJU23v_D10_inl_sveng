@@ -3,7 +3,16 @@ namespace MJU23v_D10_inl_sveng
 {
     internal class Program
     {
-        static List<SweEngGloss> dictionary;
+        static List<SweEngGloss>? dictionary;
+
+        public Program()
+        {
+            // ↓ QuickFix So We Can Add New To Empty
+            // ↓ If this is removed it should get catched by
+            // ↓ NullReferenceException in Main Try
+            dictionary = new List<SweEngGloss>();
+        }
+
         class SweEngGloss
         {
             public string word_swe, word_eng;
@@ -20,55 +29,64 @@ namespace MJU23v_D10_inl_sveng
         static void Main(string[] args)
         {
             bool running = true;
-            // ↓ QuickFix So We Can Add New To Empty
-            dictionary = new List<SweEngGloss>();
             string defaultFile = "..\\..\\..\\dict\\sweeng.lis";
             WriteLine("Welcome to the dictionary app!");
-            do
+            running = MainLogic(running, defaultFile);
+            static bool MainLogic(bool running, string defaultFile)
             {
-                Write("> ");
-                string[] argument = ReadLine().Split();
-                string command = argument[0];
-                if (command.ToLower() == "quit" || command.ToLower() == "exit")
+                try // OUTER TRY
                 {
-                    running = SafeExit();
+                    do
+                    {
+                        Write("> ");
+                        string[] argument = ReadLine()!.Split();
+                        string command = argument[0];
+                        if (command.ToLower() == "quit" || command.ToLower() == "exit")
+                        {
+                            running = SafeExit();
+                        }
+                        else if (command == "load")
+                        {
+                            if (argument.Length >= 2) LoadTry(BuildPath(argument));
+                            else if (argument.Length == 1) LoadTry(defaultFile);
+                        }
+                        else if (command == "list")
+                        {
+                            ListDict();
+                        }
+                        else if (command == "new")
+                        {
+                            if (argument.Length == 3) dictionary!.Add(new SweEngGloss(argument[1], argument[2]));
+                            else if (argument.Length == 1) NewNoParams();
+                        }
+                        else if (command == "delete")
+                        {
+                            if (argument.Length == 2) DeleteWords(argument[1]);
+                            if (argument.Length == 3) DeleteWords(argument[1], argument[2]);
+                            else if (argument.Length == 1) Delete();
+                        }
+                        else if (command == "translate")
+                        {
+                            if (argument.Length >= 2) TranslateWord(argument[1]);
+                            else if (argument.Length == 1) TranslateWord(ProptWord());
+                        }
+                        else
+                        {
+                            if (command.ToLower() != "help") WriteLine($"Unknown command: '{command}'\n");
+                            WriteLine(AvailableCommands());
+                        }
+                    } while (running);
                 }
-                else if (command == "load")
+                catch (NullReferenceException e)
                 {
-                    if (argument.Length == 2) LoadTry(BuildPath(argument));
-                    else if (argument.Length == 1) LoadTry(defaultFile);
+                    WriteLine(e.Message);
                 }
-                else if (command == "list")
+                catch (Exception e)
                 {
-                    ListDict();
+                    WriteLine(e);
                 }
-                else if (command == "new")
-                {
-                    if (argument.Length == 3) dictionary.Add(new SweEngGloss(argument[1], argument[2]));
-                    else if (argument.Length == 1) NewNoParams();
-                }
-                else if (command == "delete")
-                {
-                    if (argument.Length == 2) DeleteWords(argument[1]);
-                    if (argument.Length == 3) DeleteWords(argument[1], argument[2]);
-                    else if (argument.Length == 1) Delete();
-                }
-                else if (command == "translate")
-                {
-                    if (argument.Length == 2) TranslateWord(argument[1]);
-                    else if (argument.Length == 1) TranslateWord(ProptWord());
-                }
-                // FIXME: Om parametrar fler än två. Medela att det ej är tillåtet (kanske med en trycatch runt hela if-kedjan)
-                else
-                {
-                    if (command.ToLower() != "help") WriteLine($"Unknown command: '{command}'\n");
-                    WriteLine(AvailableCommands());
-                }
+                return running;
             }
-            while (running);
-
-            /// Bygger Path Till Projektets Dict Katalog
-            /// Och lägger till ".lis" om det saknas
             static string BuildPath(string[] argument)
             {
                 string path = $"..\\..\\..\\dict\\{argument[1]}";
@@ -79,40 +97,70 @@ namespace MJU23v_D10_inl_sveng
 
             static void NewNoParams()
             {
-                PromptWords(out string swe, out string eng);
-                dictionary.Add(new SweEngGloss(swe, eng));
+                PromptWords(out string? swe, out string? eng);
+                if ((dictionary != null) && (swe != null) && (eng != null))
+                {
+                    dictionary.Add(new SweEngGloss(swe, eng));
+                }
             }
 
             static void Delete()
             {
                 PromptWords(out string? swe, out string? eng);
-                DeleteWords(swe, eng);
+                if (swe != null)
+                {
+                    DeleteWords(swe, eng);
+                }
             }
 
             static string ProptWord()
             {
-                WriteLine("Write word to be translated: ");
-                string swe_word = ReadLine();
+                string? swe_word;
+                do
+                {
+                    WriteLine("Write word to be translated: ");
+                    swe_word = ReadLine();
+                }
+                while (swe_word == null);
                 return swe_word;
             }
         } // End Main
 
-        private static void TranslateWord(string swe_word)
+        private static void TranslateWord(string word)
         {
-            foreach (SweEngGloss gloss in dictionary)
+            if (IsInList(word))
+                return;
+            else
+                WriteLine($"{word} could not be found.");
+
+            static bool IsInList(in string word)
             {
-                if (gloss.word_swe == swe_word)
-                    WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
-                if (gloss.word_eng == swe_word)
-                    WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
+                bool result = false;
+                foreach (SweEngGloss gloss in dictionary!)
+                {
+                    if (gloss.word_swe == word)
+                    {
+                        WriteLine($"English for {gloss.word_swe} is {gloss.word_eng}");
+                        result = true;
+                    }
+                    if (gloss.word_eng == word)
+                    {
+                        WriteLine($"Swedish for {gloss.word_eng} is {gloss.word_swe}");
+                        result = true;
+                    }
+                }
+                return result;
             }
         }
 
         private static void ListDict()
         {
-            foreach (SweEngGloss gloss in dictionary)
+            if (dictionary != null)
             {
-                WriteLine($"{gloss.word_swe,-10}  - {gloss.word_eng,-10}");
+                foreach (SweEngGloss gloss in dictionary)
+                {
+                    WriteLine($"{gloss.word_swe,-10}  - {gloss.word_eng,-10}");
+                }
             }
         }
 
@@ -123,25 +171,40 @@ namespace MJU23v_D10_inl_sveng
             running = false;
             return running;
         }
+        private static void PromptWords(out string? swe, out string? eng)
+        {
+            do
+            {
+                WriteLine("Write word in Swedish: ");
+                swe = ReadLine();
+            }
+            while (swe == null);
+            do
+            {
+                Write("Write word in English: ");
+                eng = ReadLine();
+            }
+            while (swe == null);
+        }
 
         private static void DeleteWords(string swe, string? eng = null)
         {
             int index = -1;
             if (eng == null)
-                for (int i = 0; i < dictionary.Count; i++)
+                for (int i = 0; i < dictionary!.Count; i++)
                 {
                     SweEngGloss gloss = dictionary[i];
                     if (gloss.word_swe == swe)
                         index = i;
                 }
             else
-                for (int i = 0; i < dictionary.Count; i++)
+                for (int i = 0; i < dictionary!.Count; i++)
                 {
                     SweEngGloss gloss = dictionary[i];
                     if (gloss.word_swe == swe && gloss.word_eng == eng)
                         index = i;
                 }
-            try
+            try // INNER TRY check if trying to remove word not in list
             {
                 dictionary.RemoveAt(index);
             }
@@ -155,13 +218,6 @@ namespace MJU23v_D10_inl_sveng
             }
         }
 
-        private static void PromptWords(out string? swe, out string? eng)
-        {
-            WriteLine("Write word in Swedish: ");
-            swe = ReadLine();
-            Write("Write word in English: ");
-            eng = ReadLine();
-        }
 
         private static void LoadTry(string path)
         {
@@ -174,7 +230,7 @@ namespace MJU23v_D10_inl_sveng
             using (StreamReader sr = new StreamReader(argument))
             {
                 dictionary = new List<SweEngGloss>(); // Empty it!
-                string line = sr.ReadLine();
+                string? line = sr.ReadLine();
                 while (line != null)
                 {
                     SweEngGloss gloss = new SweEngGloss(line);
@@ -209,4 +265,8 @@ namespace MJU23v_D10_inl_sveng
 // DID: Bryt ut till TranslateWord()
 // FIXED: FileNotFoundException (In LoadTry)
 // FIXED: Index was out of range (om input saknas i listan) (In DeleteWords)
-// DOIN:  Informera användaren om ordet saknas i listan.(Translate)
+// DID:  Informera användaren om ordet saknas i listan.(Translate)
+// DID: Städat lite
+// FIXED: Added CatchBlock för om dictionary saknas vid new
+// DID: Flyttat new dictionarey till constructorn för program
+// DID: Gått igenom de "gröna ormarna" och sidtacklat dem varsamt med (?) (!) och (if / while != null)
